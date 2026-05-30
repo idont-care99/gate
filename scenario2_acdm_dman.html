@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kịch bản 2: A-CDM + DCL/PDC + DMAN - Tân Sơn Nhất</title>
+    <style>
+        body{font-family:Arial;margin:20px;background:#e8f0fe}
+        .container{max-width:1600px;margin:auto;background:white;padding:20px;border-radius:10px}
+        table{border-collapse:collapse;width:100%;font-size:12px}
+        th,td{border:1px solid #aaa;padding:6px;text-align:center}
+        th{background:#1a5f7a;color:white}
+        tr:nth-child(even){background:#f9f9f9}
+        .priority-vip{background:#ffd700;padding:2px 5px;border-radius:4px}
+        .priority-medical{background:#ff9999;padding:2px 5px;border-radius:4px}
+        .wake-h{background:#ffcccc;color:#c00;font-weight:bold}
+        .wake-m{background:#cce5ff;color:#004085}
+        .highlight{background-color:#d4edda}
+        .badge-dcl{background:#28a745;color:white;padding:2px 6px;border-radius:12px;font-size:10px}
+        .badge-acdm{background:#17a2b8;color:white;padding:2px 6px;border-radius:12px;font-size:10px}
+        .badge-dman{background:#ffc107;color:#333;padding:2px 6px;border-radius:12px;font-size:10px}
+        .comparison{margin-top:20px;padding:15px;background:#e8f0fe;border-radius:10px}
+        h3{color:#1a5f7a}
+    </style>
+</head>
+<body>
+<div class=container>
+    <h2>🚀 KỊCH BẢN 2: A-CDM + DCL/PDC + DMAN LOGIC</h2>
+    <p>
+        <span class="badge-dcl">DCL/PDC</span> Thay thế thoại bằng Datalink (2s) &nbsp;&nbsp;
+        <span class="badge-acdm">A-CDM</span> Chia sẻ dữ liệu realtime &nbsp;&nbsp;
+        <span class="badge-dman">DMAN</span> Tối ưu thứ tự cất cánh, ưu tiên VIP/Medical
+    </p>
+    
+    <h3>📋 BẢNG KẾT QUẢ MÔ PHỎNG</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>DMAN</th><th>ACID</th><th>Loại</th><th>Wake</th><th>Yêu cầu</th><th>SID</th><th>Ưu tiên</th>
+                <th>Gate</th><th>DCL</th><th>Push</th><th>TaxiC</th><th>Taxi</th><th>LineUp</th>
+                <th>Đến HP</th><th>CẤT CÁNH</th><th>Chờ HP</th><th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+
+    <tr>
+        <td><strong>1</strong></td>
+        <td> <strong>BAV1152</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>08:01:15</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>20</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>240s</td>
+        <td>30s</td>
+        <td>08:08:19</td>
+        <td><strong style="color:#1a5f7a">08:08:49</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>2</strong></td>
+        <td>⭐ <strong>PIC442</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:04:25</td>
+        <td>AC1C</td>
+        <td><span class="priority-vip">VIP</span></td>
+        <td><strong>19</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>240s</td>
+        <td>30s</td>
+        <td>08:09:29</td>
+        <td><strong style="color:#1a5f7a">08:10:39</strong></td>
+        <td>40s</td>
+        <td>Wake Turbulence (H->M 110s)</td>
+    </tr>
+
+    <tr>
+        <td><strong>3</strong></td>
+        <td> <strong>VJC390</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:05:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>22</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>30s</td>
+        <td>08:11:54</td>
+        <td><strong style="color:#1a5f7a">08:12:24</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>4</strong></td>
+        <td> <strong>CPA767</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:01:55</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>8</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:12:59</td>
+        <td><strong style="color:#1a5f7a">08:13:29</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>5</strong></td>
+        <td> <strong>HVN1182</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:03:40</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>11</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:15:44</td>
+        <td><strong style="color:#1a5f7a">08:16:14</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>6</strong></td>
+        <td> <strong>MAS768</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>08:09:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>16</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>360s</td>
+        <td>30s</td>
+        <td>08:18:54</td>
+        <td><strong style="color:#1a5f7a">08:19:24</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>7</strong></td>
+        <td> <strong>JAL750</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>08:08:05</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>13</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:19:09</td>
+        <td><strong style="color:#1a5f7a">08:20:14</strong></td>
+        <td>35s</td>
+        <td>Phân cách DMAN (50s)</td>
+    </tr>
+
+    <tr>
+        <td><strong>8</strong></td>
+        <td>🚑 <strong>HVN3356</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>08:12:35</td>
+        <td>AC1C</td>
+        <td><span class="priority-medical">Medical</span></td>
+        <td><strong>10</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:21:39</td>
+        <td><strong style="color:#1a5f7a">08:22:09</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>9</strong></td>
+        <td> <strong>HVN1356</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:07:10</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>1</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>840s</td>
+        <td>30s</td>
+        <td>08:24:14</td>
+        <td><strong style="color:#1a5f7a">08:24:44</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>10</strong></td>
+        <td> <strong>VJC123</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:11:20</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>5</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>600s</td>
+        <td>30s</td>
+        <td>08:24:24</td>
+        <td><strong style="color:#1a5f7a">08:25:34</strong></td>
+        <td>40s</td>
+        <td>Phân cách DMAN (50s)</td>
+    </tr>
+
+    <tr>
+        <td><strong>11</strong></td>
+        <td> <strong>KLM836</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>08:14:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>7</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:26:54</td>
+        <td><strong style="color:#1a5f7a">08:27:24</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+    <tr>
+        <td><strong>12</strong></td>
+        <td> <strong>QAN751</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:16:05</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>14</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:27:09</td>
+        <td><strong style="color:#1a5f7a">08:29:14</strong></td>
+        <td>95s</td>
+        <td>Wake Turbulence (H->M 110s)</td>
+    </tr>
+
+    <tr>
+        <td><strong>13</strong></td>
+        <td> <strong>TGW123</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>08:17:40</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>3</strong></td>
+        <td>2s</td>
+        <td>180s</td>
+        <td>2s</td>
+        <td>720s</td>
+        <td>30s</td>
+        <td>08:32:44</td>
+        <td><strong style="color:#1a5f7a">08:33:14</strong></td>
+        <td>0s</td>
+        <td>✓ (DMAN tối ưu)</td>
+    </tr>
+
+        </tbody>
+    </table>
+    
+    <div class="comparison">
+        <h3>📊 SO SÁNH HIỆU QUẢ KỊCH BẢN 1 vs KỊCH BẢN 2</h3>
+        <table style="width:100%;margin-top:10px">
+            <tr style="background:#1a5f7a;color:white">
+                <th>Tiêu chí</th><th>Kịch bản 1 (FCFS + Thoại)</th><th>Kịch bản 2 (A-CDM+DCL+DMAN)</th><th>Cải thiện</th>
+            </tr>
+            <tr>
+                <td><strong>ATC Clearance</strong></td>
+                <td>15s (thoại + readback)</td>
+                <td style="color:green;font-weight:bold">2s (DCL/PDC)</td>
+                <td style="color:green">-13s (-87%)</td>
+            </tr>
+            <tr>
+                <td><strong>Taxi Clearance</strong></td>
+                <td>10s (thoại)</td>
+                <td style="color:green;font-weight:bold">2s (Datalink)</td>
+                <td style="color:green">-8s (-80%)</td>
+            </tr>
+            <tr>
+                <td><strong>Phân cách đường băng</strong></td>
+                <td>55s (cơ bản), 120s (H→M)</td>
+                <td style="color:green;font-weight:bold">50s (cơ bản), 110s (H→M)</td>
+                <td style="color:green">-5s / -10s</td>
+            </tr>
+            <tr>
+                <td><strong>Xử lý ưu tiên</strong></td>
+                <td>Không có</td>
+                <td style="color:green;font-weight:bold">DMAN ưu tiên VIP/Medical</td>
+                <td style="color:green">Cất cánh sớm hơn 120-180s</td>
+            </tr>
+            <tr style="background:#d4edda">
+                <td><strong>Tổng thời gian mô phỏng</strong></td>
+                <td>08:33:14</td>
+                <td style="color:green;font-weight:bold">08:33:14</td>
+                <td style="color:green">Tiết kiệm 0s (0.0%)</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div style="margin-top:20px;padding:10px;background:#e8f0fe;border-radius:8px">
+        <strong>📌 CÔNG NGHỆ ÁP DỤNG TRONG KỊCH BẢN 2:</strong><br>
+        • <strong>DCL/PDC (Data Link / Pre-Departure Clearance):</strong> ATC gửi clearance trực tiếp đến màn hình buồng lái, pilot phản hồi bằng 1 nút bấm → Tiết kiệm 13s so với thoại<br>
+        • <strong>A-CDM (Airport Collaborative Decision Making):</strong> Chia sẻ dữ liệu realtime giữa ATC, Hãng bay, Ground Handling → Giảm thời gian chờ không cần thiết<br>
+        • <strong>DMAN (Departure Manager):</strong> Tối ưu thứ tự cất cánh, tự động tính CTOT (Calculated Take Off Time), ưu tiên VIP/Medical
+    </div>
+</div>
+</body>
+</html>

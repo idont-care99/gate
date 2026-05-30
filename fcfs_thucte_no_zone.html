@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FCFS Chuẩn - Tân Sơn Nhất (Đã bỏ Khu Vực)</title>
+    <style>
+        body{font-family:Arial;margin:20px;background:#e8f0fe}
+        .container{max-width:1600px;margin:auto;background:white;padding:20px;border-radius:10px}
+        table{border-collapse:collapse;width:100%;font-size:12px}
+        th,td{border:1px solid #aaa;padding:6px;text-align:center}
+        th{background:#1a5f7a;color:white}
+        tr:nth-child(even){background:#f9f9f9}
+        .priority-vip{background:#ffd700;padding:2px 5px;border-radius:4px}
+        .priority-medical{background:#ff9999;padding:2px 5px;border-radius:4px}
+        .wake-h{background:#ffcccc;color:#c00;font-weight:bold}
+        .wake-m{background:#cce5ff;color:#004085}
+        .gate-table{margin-top:30px; max-width: 600px;}
+        .gate-table th{background:#2c7a4d}
+        h3{color:#1a5f7a}
+    </style>
+</head>
+<body>
+<div class=container>
+<h2>📋 MÔ PHỎNG KỊCH BẢN 1: FCFS CHUẨN (FIRST COME FIRST SERVE TẠI HP)</h2>
+<p>Sân bay Tân Sơn Nhất - Đường băng 25L | Cập nhật cấu trúc dữ liệu đầy đủ, lược bỏ trường thông tin Khu vực.</p>
+
+<table>
+<thead>
+<tr>
+<th>Thứ tự HP</th><th>ACID</th><th>Loại</th><th>Wake</th><th>Trạng thái</th><th>Yêu cầu</th><th>SID</th><th>Ưu tiên</th>
+<th>Gate</th><th>ATC</th><th>Push</th><th>Taxi C</th><th>Taxi</th><th>LineUp</th>
+<th>Đến HP</th><th>CẤT CÁNH</th><th>Chờ HP</th><th>Ghi chú</th>
+</tr>
+</thead>
+<tbody>
+
+    <tr>
+        <td>1</td>
+        <td><strong>BAV1152</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>Ready</td>
+        <td>08:01:15</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>20</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>240s</td>
+        <td>30s</td>
+        <td>08:08:40</td>
+        <td><strong style="color:#1a5f7a">08:09:10</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td><strong>PIC442</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:04:25</td>
+        <td>AC1C</td>
+        <td><span class="priority-vip">VIP</span></td>
+        <td><strong>19</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>240s</td>
+        <td>30s</td>
+        <td>08:11:50</td>
+        <td><strong style="color:#1a5f7a">08:12:20</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+    <tr>
+        <td>3</td>
+        <td><strong>VJC390</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:05:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>22</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>180s</td>
+        <td>30s</td>
+        <td>08:12:15</td>
+        <td><strong style="color:#1a5f7a">08:13:15</strong></td>
+        <td>30s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>4</td>
+        <td><strong>CPA767</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:01:55</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>8</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:13:20</td>
+        <td><strong style="color:#1a5f7a">08:14:10</strong></td>
+        <td>20s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>5</td>
+        <td><strong>HVN1182</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:03:40</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>11</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:16:05</td>
+        <td><strong style="color:#1a5f7a">08:16:35</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+    <tr>
+        <td>6</td>
+        <td><strong>MAS768</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>Ready</td>
+        <td>08:09:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>16</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>360s</td>
+        <td>30s</td>
+        <td>08:19:15</td>
+        <td><strong style="color:#1a5f7a">08:19:45</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+    <tr>
+        <td>7</td>
+        <td><strong>JAL750</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>Ready</td>
+        <td>08:08:05</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>13</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:19:30</td>
+        <td><strong style="color:#1a5f7a">08:20:40</strong></td>
+        <td>40s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>8</td>
+        <td><strong>HVN1356</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:07:10</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>1</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>840s</td>
+        <td>30s</td>
+        <td>08:24:35</td>
+        <td><strong style="color:#1a5f7a">08:25:05</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+    <tr>
+        <td>9</td>
+        <td><strong>VJC123</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:11:20</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>5</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>600s</td>
+        <td>30s</td>
+        <td>08:24:45</td>
+        <td><strong style="color:#1a5f7a">08:26:00</strong></td>
+        <td>45s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>10</td>
+        <td><strong>HVN3356</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>Ready</td>
+        <td>08:12:35</td>
+        <td>AC1C</td>
+        <td><span class="priority-medical">Medical</span></td>
+        <td><strong>10</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:25:00</td>
+        <td><strong style="color:#1a5f7a">08:26:55</strong></td>
+        <td>85s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>11</td>
+        <td><strong>KLM836</strong></td>
+        <td>B744</td>
+        <td><span class="wake-h">H</span></td>
+        <td>Ready</td>
+        <td>08:14:50</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>7</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>540s</td>
+        <td>30s</td>
+        <td>08:27:15</td>
+        <td><strong style="color:#1a5f7a">08:27:50</strong></td>
+        <td>5s</td>
+        <td>Phân cách cơ bản (55s)</td>
+    </tr>
+
+    <tr>
+        <td>12</td>
+        <td><strong>QAN751</strong></td>
+        <td>A320</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:16:05</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>14</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>480s</td>
+        <td>30s</td>
+        <td>08:27:30</td>
+        <td><strong style="color:#1a5f7a">08:29:50</strong></td>
+        <td>110s</td>
+        <td>Phạt nhiễu động (H->M 120s)</td>
+    </tr>
+
+    <tr>
+        <td>13</td>
+        <td><strong>TGW123</strong></td>
+        <td>A321</td>
+        <td><span class="wake-m">M</span></td>
+        <td>Ready</td>
+        <td>08:17:40</td>
+        <td>AC1C</td>
+        <td><span class="">Normal</span></td>
+        <td><strong>3</strong></td>
+        <td>15s</td>
+        <td>180s</td>
+        <td>10s</td>
+        <td>720s</td>
+        <td>30s</td>
+        <td>08:33:05</td>
+        <td><strong style="color:#1a5f7a">08:33:35</strong></td>
+        <td>0s</td>
+        <td>✓</td>
+    </tr>
+
+</tbody>
+</table>
+
+<h3>📍 BẢNG THỜI GIAN TAXI THEO BẾN ĐỖ</h3>
+<table class="gate-table">
+<thead><tr><th>Gate (Bến đỗ)</th><th>Thời gian taxi (giây)</th><th>Thời gian taxi (phút)</th></tr></thead>
+<tbody>
+<tr><td><strong>1</strong></td><td>840s</td><td>14 phút</td></tr><tr><td><strong>2</strong></td><td>780s</td><td>13 phút</td></tr><tr><td><strong>3</strong></td><td>720s</td><td>12 phút</td></tr><tr><td><strong>4</strong></td><td>660s</td><td>11 phút</td></tr><tr><td><strong>5</strong></td><td>600s</td><td>10 phút</td></tr><tr><td><strong>6</strong></td><td>540s</td><td>9 phút</td></tr><tr><td><strong>7</strong></td><td>540s</td><td>9 phút</td></tr><tr><td><strong>8</strong></td><td>480s</td><td>8 phút</td></tr><tr><td><strong>9</strong></td><td>540s</td><td>9 phút</td></tr><tr><td><strong>10</strong></td><td>540s</td><td>9 phút</td></tr><tr><td><strong>11</strong></td><td>540s</td><td>9 phút</td></tr><tr><td><strong>12</strong></td><td>480s</td><td>8 phút</td></tr><tr><td><strong>13</strong></td><td>480s</td><td>8 phút</td></tr><tr><td><strong>14</strong></td><td>480s</td><td>8 phút</td></tr><tr><td><strong>15</strong></td><td>480s</td><td>8 phút</td></tr><tr><td><strong>16</strong></td><td>360s</td><td>6 phút</td></tr><tr><td><strong>17</strong></td><td>300s</td><td>5 phút</td></tr><tr><td><strong>18</strong></td><td>300s</td><td>5 phút</td></tr><tr><td><strong>19</strong></td><td>240s</td><td>4 phút</td></tr><tr><td><strong>20</strong></td><td>240s</td><td>4 phút</td></tr><tr><td><strong>21</strong></td><td>180s</td><td>3 phút</td></tr><tr><td><strong>22</strong></td><td>180s</td><td>3 phút</td></tr>
+</tbody>
+</table>
+
+<div style="margin-top:20px;padding:10px;background:#e8f0fe;border-radius:8px">
+<strong>📌 CÔNG THỨC MÔ PHỎNG SƠ BỘ THỜI GIAN:</strong> Thời điểm yêu cầu &rarr; ATC Clearance (15)s &rarr; Pushback (180)s &rarr; Taxi Clearance (10)s &rarr; Thời gian Taxi bến đỗ &rarr; Đến HP &rarr; Line Up (30)s &rarr; Tính toán phân cách đường băng &rarr; Thời điểm Cất cánh.
+</div>
+</div>
+</body>
+</html>
