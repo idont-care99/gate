@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Mô phỏng sân bay</title>
+    <meta charset="UTF-8">
+    <title>Hệ thống Mô phỏng Sân bay TSN</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding-top: 50px; background: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #1a5f7a; }
+        .btn { display: block; width: 80%; margin: 15px auto; padding: 15px; text-decoration: none; color: white; background: #1a5f7a; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .btn:hover { background: #2c7a4d; }
+    </style>
 </head>
 <body>
-
-    <h1>CHỌN KỊCH BẢN</h1>
-
-    <p>
-        <a href="fcfs_thucte_no_zone.html">
-            Kịch bản 1 - FCFS thực tế
-        </a>
-    </p>
-
-    <p>
-        <a href="scenario2_acdm_dman.html">
-            Kịch bản 2 - A-CDM / DMAN
-        </a>
-    </p>
-
+    <div class="container">
+        <h1>Hệ thống Mô phỏng Đường băng 25L</h1>
+        <p>Vui lòng chọn kịch bản để xem chi tiết:</p>
+        <a href="fcfs_thucte_no_zone.html" class="btn">Kịch bản 1: FCFS Chuẩn</a>
+        <a href="optimised_gate_simulation.html" class="btn">Kịch bản 2: Quy trình tối ưu Datalink</a>
+    </div>
 </body>
 </html>
