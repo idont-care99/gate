@@ -23,42 +23,38 @@
 <body>
 <div class="container">
     <h2>📋 MÔ PHỎNG: FCFS MIXED MODE (CÓ TÍNH GAP HẠ CÁNH ARRIVALS)</h2>
-    <p>Sân bay Tân Sơn Nhất - Đường băng 25L | Tự động tính toán phân cách Cất-Cất, Cất-Hạ và Hạ-Cất.</p>
+    <p>Sân bay Tân Sơn Nhất - Đường băng 25L/25R | Dòng Arrivals đã được tịnh tiến lùi 10 phút để tối ưu hóa việc xung đột tính GAP.</p>
 
-    <!-- BẢNG KẾT QUẢ MÔ PHỎNG -->
     <table id="simulation-table">
         <thead>
             <tr>
-                <th>Thứ tự</th><th>ACID</th><th>Loại</th><th>Wake</th><th>Loại bay</th><th>Yêu cầu / Touchdown</th><th>Gate</th><th>Đến HP</th><th>CẤT CÁNH / HẠ CÁNH</th><th>Chờ tại HP</th><th>Ghi chú / Phân cách</th>
+                <th>Thứ tự Tổng hợp</th><th>ACID</th><th>Loại tàu</th><th>Wake</th><th>Luồng bay</th><th>Yêu cầu / Touchdown</th><th>Gate</th><th>Đến HP</th><th>CẤT CÁNH / HẠ CÁNH</th><th>Phạt chờ phụ trội tại HP</th><th>Ghi chú / Phân cách điều phối ATC</th>
             </tr>
         </thead>
         <tbody>
-            <!-- Dữ liệu sẽ được Javascript tự động đổ vào đây -->
-        </tbody>
+            </tbody>
     </table>
 
     <div style="margin-top:20px;padding:10px;background:#e8f0fe;border-radius:8px">
-        <strong>📌 QUY TẮC PHÂN CÁCH TRONG KỊCH BẢN (MIXED MODE):</strong><br>
-        * DEP sau DEP: Khởi hành cơ bản 55s. Phạt nhiễu động Heavy -> Medium: 120s.<br>
-        * DEP sau ARR: Máy bay cất cánh phải đợi máy bay hạ cánh trước đó chạy xả đà thoát đường băng (ROT ARR = 60s).<br>
-        * DEP trước ARR: Máy bay cất cánh phải cất cánh TRƯỚC KHI máy bay hạ cánh tiếp theo chạm bánh tối thiểu 60s (Gap an toàn).
+        <strong>📌 QUY TẮC TÍNH TOÁN KHOẢNG TRỐNG (GAP DETECT):</strong><br>
+        * <b>DEP sau DEP:</b> Phân cách cơ bản 55s. Phạt nhiễu động Heavy &rarr; Medium: 120s.<br>
+        * <b>DEP sau ARR:</b> Máy bay cất cánh tại HP phải chờ máy bay hạ cánh xả đà thoát ly xong xuôi (ROT ARR = 60s).<br>
+        * <b>DEP trước ARR (Đòi GAP):</b> Máy bay tại HP chỉ được phép cất cánh nếu thời điểm cất cánh cách thời điểm tàu bay hạ cánh tiếp theo chạm bánh tối thiểu 60s. Nếu không đủ 60s, tàu cất cánh sẽ bị "lock" lại tại HP để nhường đường.
     </div>
 </div>
 
 <script>
-// 1. Cấu hình bảng thời gian Taxi theo Gate
+// 1. Cấu hình bảng thời gian Taxi theo Gate từ file gốc của bạn
 const gateTaxiTimes = {
     1: 840, 2: 780, 3: 720, 4: 660, 5: 600, 6: 540, 7: 540, 8: 480, 9: 540, 10: 540,
     11: 540, 12: 480, 13: 480, 14: 480, 15: 480, 16: 360, 17: 300, 18: 300, 19: 240, 20: 240, 21: 180, 22: 180
 };
 
-// Helper biến đổi chuỗi HH:MM:SS thành số giây tính từ 00:00:00
 function timeToSeconds(tStr) {
     const p = tStr.split(':');
     return parseInt(p[0], 10) * 3600 + parseInt(p[1], 10) * 60 + parseInt(p[2], 10);
 }
 
-// Helper biến đổi số giây thành chuỗi HH:MM:SS
 function secondsToTime(secs) {
     const h = Math.floor(secs / 3600).toString().padStart(2, '0');
     const m = Math.floor((secs % 3600) / 60).toString().padStart(2, '0');
@@ -66,7 +62,7 @@ function secondsToTime(secs) {
     return `${h}:${m}:${s}`;
 }
 
-// 2. DANH SÁCH MÁY BAY KHỞI HÀNH (DEPARTURES) - Giữ nguyên từ dữ liệu của bạn
+// 2. DANH SÁCH MÁY BAY KHỞI HÀNH (DEPARTURES) - Giữ nguyên gốc
 const departures = [
     { acid: "BAV1152", type: "B744", wake: "H", req: "08:01:15", gate: 20 },
     { acid: "PIC442",  type: "A320", wake: "M", req: "08:04:25", gate: 19 },
@@ -83,20 +79,23 @@ const departures = [
     { acid: "TGW123",  type: "A321", wake: "M", req: "08:17:40", gate: 3 }
 ];
 
-// 3. THÊM LUỒNG MÁY BAY HẠ CÁNH (ARRIVALS) - Tạo các Gap thực tế xen kẽ vào dòng thời gian
+// 3. DANH SÁCH MÁY BAY HẠ CÁNH (ARRIVALS) - ĐÃ ĐƯỢC LÙI TIME XUỐNG 10 PHÚT ĐỂ TẠO XUNG ĐỘT GAP
 const arrivals = [
-    { acid: "HVN211", type: "A359", wake: "H", touchdown: "08:11:00" }, // Hạ cánh lúc 08:11:00
-    { acid: "VJC623", type: "A321", wake: "M", touchdown: "08:18:00" }, // Hạ cánh lúc 08:18:00
-    { acid: "SIA872", type: "B787", wake: "H", touchdown: "08:26:30" }  // Hạ cánh lúc 08:26:30
+    { acid: "VJC370",  type: "A320", wake: "M", touchdown: "08:13:20" },
+    { acid: "AAR731",  type: "B744", wake: "H", touchdown: "08:15:55" },
+    { acid: "SIA178",  type: "B744", wake: "H", touchdown: "08:18:40" },
+    { acid: "CSN3069", type: "A321", wake: "M", touchdown: "08:21:10" },
+    { acid: "CAL5874", type: "B744", wake: "H", touchdown: "08:23:55" },
+    { acid: "CPA765",  type: "A320", wake: "M", touchdown: "08:26:30" },
+    { acid: "BAV1158", type: "A320", wake: "M", touchdown: "08:29:15" }
 ];
 
-// 4. TIẾN HÀNH THUẬT TOÁN MÔ PHỎNG XẾP HÀNG & TÍNH GAP
+// 4. LOGIC MÔ PHỎNG MIXED MODE
 function runSimulation() {
-    // Sơ chế dữ liệu Departures: Tính thời gian tới HP dựa theo công thức của bạn
+    // Sơ chế dữ liệu cất cánh (DEP)
     let depProcessed = departures.map(d => {
         const reqSec = timeToSeconds(d.req);
         const taxiSec = gateTaxiTimes[d.gate] || 300;
-        // Đến HP = Req + ATC(15s) + Push(180s) + TaxiClearance(10s) + TaxiTime
         const arrHPSec = reqSec + 15 + 180 + 10 + taxiSec; 
         return {
             ...d,
@@ -107,74 +106,64 @@ function runSimulation() {
         };
     });
 
-    // Sắp xếp các máy bay khởi hành theo thứ tự thực tế đến HP (Nguyên tắc FCFS tại HP)
+    // Sắp xếp thứ tự DEP đến HP trước phục vụ trước (FCFS tại HP)
     depProcessed.sort((a, b) => a.arrHPSec - b.arrHPSec);
 
-    // Sơ chế dữ liệu Arrivals
+    // Sơ chế dữ liệu hạ cánh (ARR)
     let arrProcessed = arrivals.map(a => {
         const tdSec = timeToSeconds(a.touchdown);
         return {
             ...a,
             role: "ARR",
             touchdownSec: tdSec,
-            runwayClearSec: tdSec + 60 // Thoát khỏi đường băng sau 60s (ROT)
+            runwayClearSec: tdSec + 60 // Thời gian chiếm dụng đường băng hạ cánh (ROT = 60s)
         };
     });
 
-    // Mảng gộp chung để xếp lịch trên đường băng công cộng
     let finalTimeline = [];
-    let lastEventTime = 0; // Thời điểm đường băng trống gần nhất
-    let lastEventType = ""; // "DEP" hoặc "ARR"
-    let lastWake = ""; // Wake của tàu bay trước để tính nhiễu động
+    let lastEventTime = 0; 
+    let lastEventType = ""; 
+    let lastWake = ""; 
 
-    // Duyệt qua từng máy bay khởi hành (DEP) đã xếp hàng FCFS tại HP
     for (let i = 0; i < depProcessed.length; i++) {
         let dep = depProcessed[i];
-        
-        // Tìm xem từ lúc chiếc cất cánh trước hoạt động đến lúc chiếc DEP này sẵn sàng, có chiếc ARR nào hạ cánh chen ngang không
         let staticReadyTime = Math.max(dep.readyDepSec, lastEventTime);
-        
-        // Kiểm tra xem thời gian dự kiến cất cánh này có bị xung đột với máy bay hạ cánh nào không
-        let conflictARR = arrProcessed.find(arr => {
-            // Xung đột xảy ra nếu máy bay định cất cánh trong khoảng thời gian từ [ARR touchdown - 60s] đến [ARR runway clear]
-            return (staticReadyTime >= arr.touchdownSec - 60 && staticReadyTime < arr.runwayClearSec);
-        });
 
-        // Bỏ các tàu bay ARR đã hạ cánh xong hoàn toàn trước sự kiện này vào timeline trước
+        // Đẩy các tàu ARR đã thực hiện xong hoàn toàn trước khi chiếc DEP này sẵn sàng vào timeline trước
         while(arrProcessed.length > 0 && arrProcessed[0].runwayClearSec <= staticReadyTime) {
             let currentArr = arrProcessed.shift();
             finalTimeline.push(currentArr);
             lastEventTime = currentArr.runwayClearSec;
             lastEventType = "ARR";
             lastWake = currentArr.wake;
+            staticReadyTime = Math.max(dep.readyDepSec, lastEventTime);
         }
 
-        // Tính toán thời điểm cất cánh thực tế sau khi tính toán các loại phân cách
-        let actualDepTime = Math.max(dep.readyDepSec, lastEventTime);
-        let note = "✓ Sẵn sàng cất cánh";
+        let actualDepTime = staticReadyTime;
+        let note = "✓ Sẵn sàng cất cánh ngay";
 
+        // Áp dụng luật phân cách dòng
         if (lastEventType === "DEP") {
-            // Phân cách DEP - DEP
-            let sep = 55; // Mặc định 55s
+            let sep = 55;
             if (lastWake === "H" && dep.wake === "M") {
-                sep = 120; // Phạt nhiễu động Heavy -> Medium
-                note = "Phạt nhiễu động (H->M 120s)";
+                sep = 120;
+                note = "Phạt nhiễu động dòng cất cánh (H -> M: 120s)";
             } else {
                 note = "Phân cách cất cánh tiêu chuẩn (55s)";
             }
             actualDepTime = Math.max(actualDepTime, lastEventTime + sep);
         } else if (lastEventType === "ARR") {
-            // Phân cách ARR - DEP: Phải đợi tàu hạ cánh trước thoát ly đường băng hoàn toàn
-            actualDepTime = Math.max(actualDepTime, lastEventTime); 
-            note = "Sau tàu hạ cánh (Đợi thoát ly đường băng)";
+            // DEP đi sau ARR: Phải đợi ARR thoát hẳn đường băng (đã được tính bằng runwayClearSec)
+            actualDepTime = Math.max(actualDepTime, lastEventTime);
+            note = "Cất cánh sau tàu hạ cánh (Đợi thoát ly xong)";
         }
 
-        // KIỂM TRA LẠI VỚI TÀU HẠ CÁNH TIẾP THEO (Tạo GAP trước ARR)
+        // KIỂM TRA ĐÒI GAP AN TOÀN TRƯỚC TÀU HẠ CÁNH TIẾP THEO
         if (arrProcessed.length > 0) {
             let nextArr = arrProcessed[0];
-            // Nếu thời điểm cất cánh tính toán bị lẹm vào khoảng 60s trước khi chiếc ARR tiếp theo chạm bánh
+            // Nếu thời gian cất cánh dự kiến vượt quá mốc [Touchdown - 60s] -> KHÔNG ĐỦ GAP
             if (actualDepTime > nextArr.touchdownSec - 60) {
-                // Không đủ GAP an toàn -> Bắt buộc phải nhường cho chiếc ARR hạ cánh trước, chiếc DEP lùi lại sau
+                // Hủy lệnh cất cánh, chèn tàu ARR này lên trước
                 let currentArr = arrProcessed.shift();
                 finalTimeline.push(currentArr);
                 
@@ -182,15 +171,15 @@ function runSimulation() {
                 lastEventType = "ARR";
                 lastWake = currentArr.wake;
 
-                // Tính lại thời gian cất cánh: Phải sau khi chiếc ARR chen ngang này thoát đường băng
+                // Tính lại thời gian cất cánh cho chiếc DEP hiện tại (Phải lùi hẳn ra sau chiếc ARR vừa hạ cánh)
                 actualDepTime = lastEventTime;
-                note = "Bị giữ lại do không đủ GAP an toàn trước tàu hạ cánh " + currentArr.acid;
+                note = "Bị hoãn tại HP: Không đủ Gap an toàn trước tàu hạ cánh " + currentArr.acid;
             }
         }
 
-        // Ghi nhận kết quả chiếc DEP vào lịch trình
+        // Ghi nhận dữ liệu
         dep.actualDepTime = actualDepTime;
-        dep.waitingTimeAtHP = actualDepTime - dep.arrHPSec - 30; // Chờ phụ trội tại HP ngoài 30s Line-up
+        dep.waitingTimeAtHP = actualDepTime - dep.arrHPSec - 30; // Trừ đi 30s Line-up mặc định
         dep.note = note;
 
         finalTimeline.push(dep);
@@ -199,12 +188,12 @@ function runSimulation() {
         lastWake = dep.wake;
     }
 
-    // Đẩy nốt các tàu bay ARR còn sót lại ở cuối danh sách vào timeline (nếu có)
+    // Đẩy nốt các tàu ARR còn sót lại (nếu có)
     while(arrProcessed.length > 0) {
         finalTimeline.push(arrProcessed.shift());
     }
 
-    // 5. HIỂN THỊ DỮ LIỆU LÊN BẢNG HTML
+    // 5. HIỂN THỊ LÊN BẢNG HTML
     const tbody = document.querySelector("#simulation-table tbody");
     tbody.innerHTML = "";
 
@@ -217,13 +206,13 @@ function runSimulation() {
                 <td><strong>${item.acid}</strong></td>
                 <td>${item.type}</td>
                 <td><span class="wake-${item.wake.toLowerCase()}">${item.wake}</span></td>
-                <td><b>🛬 HẠ CÁNH</b></td>
-                <td>${item.touchdown} (Touchdown)</td>
+                <td><b>🛬 ARR (HẠ CÁNH)</b></td>
+                <td>${item.touchdown}</td>
                 <td>-</td>
                 <td>-</td>
                 <td><strong style="color:#137333">${secondsToTime(item.touchdownSec)}</strong></td>
                 <td>0s</td>
-                <td>Thoát đường băng lúc ${secondsToTime(item.runwayClearSec)} (ROT 60s)</td>
+                <td>Thoát ly đường băng lúc ${secondsToTime(item.runwayClearSec)} (ROT 60s)</td>
             `;
         } else {
             row.innerHTML = `
@@ -231,7 +220,7 @@ function runSimulation() {
                 <td><strong>${item.acid}</strong></td>
                 <td>${item.type}</td>
                 <td><span class="wake-${item.wake.toLowerCase()}">${item.wake}</span></td>
-                <td>🛫 Cất cánh</td>
+                <td>🛫 DEP (CẤT CÁNH)</td>
                 <td>${item.req}</td>
                 <td><strong>${item.gate}</strong></td>
                 <td>${secondsToTime(item.arrHPSec)}</td>
@@ -244,7 +233,6 @@ function runSimulation() {
     });
 }
 
-// Chạy mô phỏng khi trang web load xong
 window.onload = runSimulation;
 </script>
 </body>
