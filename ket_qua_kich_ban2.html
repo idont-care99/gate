@@ -179,50 +179,6 @@
 
 <main>
 
-  <div class="section-title">Thay đổi so với Kịch bản 1 (FCFS)</div>
-  <div class="diff-banner">
-    <div class="diff-item">
-      <span class="diff-label">Cấp phép cất cánh</span>
-      <span class="diff-old">15s thoại</span> →
-      <span class="diff-new">2s datalink</span>
-    </div>
-    <div class="diff-item">
-      <span class="diff-label">Cấp phép lăn</span>
-      <span class="diff-old">10s thoại</span> →
-      <span class="diff-new">2s datalink</span>
-    </div>
-    <div class="diff-item">
-      <span class="diff-label">Sắp xếp DEP</span>
-      <span class="diff-old">FCFS (ready_time)</span> →
-      <span class="diff-new">DMAN Index (ưu tiên VIP/Medical)</span>
-    </div>
-    <div class="diff-item">
-      <span class="diff-label">Phân cách DEP→DEP</span>
-      <span class="diff-old">90–240s</span> →
-      <span class="diff-new">80–220s</span>
-    </div>
-    <div class="diff-item">
-      <span class="diff-label">Phân cách ARR→ARR</span>
-      <span class="diff-old">120–240s</span> →
-      <span class="diff-new">110–220s</span>
-    </div>
-  </div>
-
-  <div class="section-title">Tổng quan</div>
-  <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-value">20</div><div class="kpi-label">Tổng sự kiện</div></div>
-        <div class="kpi-card arr-card"><div class="kpi-value">7</div><div class="kpi-label">Chuyến hạ cánh</div></div>
-        <div class="kpi-card dep-card"><div class="kpi-value">13</div><div class="kpi-label">Chuyến cất cánh</div></div>
-        <div class="kpi-card"><div class="kpi-value">2p21s</div><div class="kpi-label">Chờ TB (DEP)</div></div>
-        <div class="kpi-card"><div class="kpi-value">10s</div><div class="kpi-label">Chờ TB (ARR)</div></div>
-        <div class="kpi-card warn-card"><div class="kpi-value">6p30s</div><div class="kpi-label">Chờ tối đa</div></div>
-        <div class="kpi-card save-card"><div class="kpi-value">▼ 47s</div><div class="kpi-label">Tiết kiệm TB/chuyến vs KB1</div></div>
-    </div>
-
-  <div class="section-title" style="margin-top:18px">Thông lượng theo đường băng</div>
-  <div class="tp-bar"><div class="tp-item"><span class="tp-rwy">25L</span>: <strong>13</strong> chuyến</div><div class="tp-item"><span class="tp-rwy">25R</span>: <strong>7</strong> chuyến</div></div>
-
-  <div class="section-title">Kết quả chi tiết – DMAN Queue</div>
   <div class="legend">
     <div class="legend-item"><div class="legend-dot" style="background:#1a4a7a;border:1px solid #2e7bcf"></div> DEP – Cất cánh</div>
     <div class="legend-item"><div class="legend-dot" style="background:#0d3320;border:1px solid #28a745"></div> ARR – Hạ cánh</div>
