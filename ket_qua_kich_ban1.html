@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mô phỏng Kịch bản 1 – FCFS | VVTS 25R/25L</title>
+<style>
+  :root {
+    --blue-dark:  #0d2137;
+    --blue-mid:   #1a4a7a;
+    --blue-light: #2e7bcf;
+    --dep-bg:     #e8f4fd;
+    --dep-border: #2e7bcf;
+    --arr-bg:     #edfbf0;
+    --arr-border: #28a745;
+    --yellow:     #ffc107;
+    --red:        #dc3545;
+    --grey-light: #f5f7fa;
+    --grey-mid:   #dde3ea;
+    --text-dark:  #1a1a2e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0b1a2b;
+    color: #e0eaf5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0d2137 0%, #1a4a7a 100%);
+    padding: 28px 40px 22px;
+    border-bottom: 3px solid #2e7bcf;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo-circle {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #2e7bcf;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header p  { font-size: 0.85rem; color: #8ab4d8; margin-top: 4px; }
+
+  /* ── Main wrapper ── */
+  main { padding: 28px 40px; }
+
+  /* ── Section titles ── */
+  .section-title {
+    font-size: 1rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: #8ab4d8;
+    margin-bottom: 14px; margin-top: 28px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: ''; display: inline-block;
+    width: 4px; height: 18px; border-radius: 2px;
+    background: #2e7bcf;
+  }
+
+  /* ── KPI cards ── */
+  .kpi-grid {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .kpi-card {
+    background: #12263f;
+    border: 1px solid #1e3f62;
+    border-radius: 10px;
+    padding: 16px 22px;
+    min-width: 140px; flex: 1;
+    text-align: center;
+    border-top: 4px solid #2e7bcf;
+  }
+  .dep-card  { border-top-color: #2e7bcf; }
+  .arr-card  { border-top-color: #28a745; }
+  .warn-card { border-top-color: #ffc107; }
+  .kpi-value {
+    font-size: 1.9rem; font-weight: 800; color: #fff;
+    line-height: 1.1;
+  }
+  .kpi-label { font-size: 0.78rem; color: #7a9bb8; margin-top: 5px; }
+
+  /* ── Throughput ── */
+  .tp-bar {
+    display: flex; gap: 16px;
+    background: #12263f; border: 1px solid #1e3f62;
+    border-radius: 8px; padding: 12px 20px;
+    margin-bottom: 8px;
+  }
+  .tp-item { font-size: 0.9rem; }
+  .tp-rwy  { color: #2e7bcf; font-weight: 700; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    font-size: 0.82rem; margin-bottom: 16px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot  { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* ── Table wrapper ── */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid #1e3f62;
+    box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.84rem; min-width: 1000px;
+  }
+  thead tr {
+    background: #0d2137;
+    color: #8ab4d8;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: .06em;
+  }
+  thead th {
+    padding: 11px 12px; text-align: center;
+    border-bottom: 2px solid #2e7bcf;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid #1a3251; }
+  tbody tr:hover { background: #162d48 !important; }
+
+  tbody tr.dep { background: #0e2236; }
+  tbody tr.arr { background: #0b1f16; }
+
+  td { padding: 9px 12px; text-align: center; vertical-align: middle; }
+
+  .seq-col  { color: #555e70; font-size: 0.78rem; width: 36px; }
+  .acid-col { font-weight: 700; font-family: monospace; font-size: 0.9rem; color: #e8f4fd; }
+  .rwy-col  { font-weight: 700; color: #f0c040; }
+  .highlight { font-weight: 800; color: #5bc8ff; font-size: 0.95rem; }
+
+  .na-cell  { color: #3a5570; font-style: italic; font-size: 0.8rem; }
+
+  .wait-high { color: #ff6b6b; font-weight: 700; }
+  .wait-med  { color: #ffc107; font-weight: 600; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; padding: 2px 9px;
+    border-radius: 4px; font-weight: 700; font-size: 0.78rem;
+    letter-spacing: .04em;
+  }
+  .badge.dep { background: #1a4a7a; color: #7bc8ff; border: 1px solid #2e7bcf; }
+  .badge.arr { background: #0d3320; color: #5fe89a; border: 1px solid #28a745; }
+
+  .wake-badge {
+    display: inline-block; padding: 1px 7px;
+    border-radius: 3px; font-size: 0.74rem; font-weight: 600;
+  }
+  .wake-h { background: #4a1a1a; color: #ff8888; }
+  .wake-m { background: #1a3a4a; color: #88d0ff; }
+  .wake-l { background: #1a3a1a; color: #88e888; }
+  .wake-s { background: #3a1a4a; color: #cc88ff; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center; font-size: 0.75rem; color: #3a5570;
+    padding: 20px 40px 28px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-circle">✈</div>
+  <div>
+    <h1>Mô phỏng Kịch bản 1 – FCFS</h1>
+    <p>Sân bay Quốc tế Tân Sơn Nhất (VVTS) &nbsp;|&nbsp; Đường băng 25R / 25L &nbsp;|&nbsp;
+       Thuật toán: <strong>First Come First Served</strong></p>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-title">Tổng quan</div>
+  <div class="kpi-grid">
+    
+        <div class="kpi-card">
+            <div class="kpi-value">20</div>
+            <div class="kpi-label">Tổng sự kiện</div>
+        </div>
+        <div class="kpi-card arr-card">
+            <div class="kpi-value">7</div>
+            <div class="kpi-label">Chuyến hạ cánh (ARR)</div>
+        </div>
+        <div class="kpi-card dep-card">
+            <div class="kpi-value">13</div>
+            <div class="kpi-label">Chuyến cất cánh (DEP)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">3p11s</div>
+            <div class="kpi-label">Chờ TB (DEP)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-value">12s</div>
+            <div class="kpi-label">Chờ TB (ARR)</div>
+        </div>
+        <div class="kpi-card warn-card">
+            <div class="kpi-value">8p10s</div>
+            <div class="kpi-label">Chờ tối đa</div>
+        </div>
+    
+  </div>
+
+  <div class="section-title" style="margin-top:18px">Thông lượng theo đường băng</div>
+  <div class="tp-bar"><div class="tp-item"><span class="tp-rwy">25L</span> : <strong>13</strong> chuyến</div><div class="tp-item"><span class="tp-rwy">25R</span> : <strong>7</strong> chuyến</div></div>
+
+  <div class="section-title">Kết quả chi tiết</div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#1a4a7a;border:1px solid #2e7bcf"></div> DEP – Cất cánh
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#0d3320;border:1px solid #28a745"></div> ARR – Hạ cánh
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ff6b6b"></div> Chờ &gt; 10 phút
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:#ffc107"></div> Chờ &gt; 5 phút
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Loại</th>
+          <th>Chuyến bay</th>
+          <th>Tàu bay</th>
+          <th>Wake</th>
+          <th>Đường băng</th>
+          <th>Ready Time</th>
+          <th>Gate</th>
+          <th>T_req</th>
+          <th>T_HP (DEP)</th>
+          <th>SID</th>
+          <th>T_actual ✈</th>
+          <th>Chờ</th>
+          <th>GAP</th>
+          <th>RWY Free</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr class="arr">
+            <td class="seq-col">1</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">VJC370</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:04:00</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:04:00</td>
+            <td class="">0s</td>
+            <td>0s</td>
+            <td>08:04:55</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">2</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">AAR731</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:07:30</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:07:30</td>
+            <td class="">0s</td>
+            <td>3p30s</td>
+            <td>08:08:30</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">3</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">BAV1152</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:09:10</td>
+            
+                <td>20</td>
+                <td>08:01:15</td>
+                <td>08:08:40</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:09:10</td>
+            <td class="">0s</td>
+            <td>0s</td>
+            <td>08:10:00</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">4</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">PIC442</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:12:20</td>
+            
+                <td>19</td>
+                <td>08:04:25</td>
+                <td>08:11:50</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:12:20</td>
+            <td class="">0s</td>
+            <td>3p10s</td>
+            <td>08:13:05</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">5</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">VJC390</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:12:45</td>
+            
+                <td>22</td>
+                <td>08:05:50</td>
+                <td>08:12:15</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:14:35</td>
+            <td class="">1p50s</td>
+            <td>2p15s</td>
+            <td>08:15:20</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">6</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">CPA767</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:13:50</td>
+            
+                <td>8</td>
+                <td>08:01:55</td>
+                <td>08:13:20</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:16:50</td>
+            <td class="">3p00s</td>
+            <td>2p15s</td>
+            <td>08:17:35</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">7</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">SIA178</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:14:00</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:14:00</td>
+            <td class="">0s</td>
+            <td>6p30s</td>
+            <td>08:15:00</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">8</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">CSN3069</td>
+            <td>A321</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:16:30</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:18:00</td>
+            <td class="">1p30s</td>
+            <td>4p00s</td>
+            <td>08:18:55</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">9</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">HVN1182</td>
+            <td>A321</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:16:35</td>
+            
+                <td>11</td>
+                <td>08:03:40</td>
+                <td>08:16:05</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:19:05</td>
+            <td class="">2p30s</td>
+            <td>2p15s</td>
+            <td>08:19:50</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">10</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">MAS768</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:19:45</td>
+            
+                <td>16</td>
+                <td>08:09:50</td>
+                <td>08:19:15</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:21:20</td>
+            <td class="">1p35s</td>
+            <td>2p15s</td>
+            <td>08:22:10</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">11</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">JAL750</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:20:00</td>
+            
+                <td>13</td>
+                <td>08:08:05</td>
+                <td>08:19:30</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:23:40</td>
+            <td class="">3p40s</td>
+            <td>2p20s</td>
+            <td>08:24:30</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">12</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">CAL5874</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:21:00</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:21:00</td>
+            <td class="">0s</td>
+            <td>3p00s</td>
+            <td>08:22:00</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">13</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">HVN1356</td>
+            <td>A321</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:25:05</td>
+            
+                <td>1</td>
+                <td>08:07:10</td>
+                <td>08:24:35</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:26:30</td>
+            <td class="">1p25s</td>
+            <td>2p50s</td>
+            <td>08:27:15</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">14</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">VJC123</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:25:15</td>
+            
+                <td>5</td>
+                <td>08:11:20</td>
+                <td>08:24:45</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:28:45</td>
+            <td class="">3p30s</td>
+            <td>2p15s</td>
+            <td>08:29:30</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">15</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">HVN3356</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:25:30</td>
+            
+                <td>10</td>
+                <td>08:12:35</td>
+                <td>08:25:00</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:31:00</td>
+            <td class="wait-med">5p30s</td>
+            <td>2p15s</td>
+            <td>08:31:50</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">16</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">KLM836</td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:27:45</td>
+            
+                <td>7</td>
+                <td>08:14:50</td>
+                <td>08:27:15</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:33:20</td>
+            <td class="wait-med">5p35s</td>
+            <td>2p20s</td>
+            <td>08:34:10</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">17</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">QAN751</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:28:00</td>
+            
+                <td>14</td>
+                <td>08:16:05</td>
+                <td>08:27:30</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:36:10</td>
+            <td class="wait-med">8p10s</td>
+            <td>2p50s</td>
+            <td>08:36:55</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">18</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">CPA765</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:29:00</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:29:00</td>
+            <td class="">0s</td>
+            <td>8p00s</td>
+            <td>08:29:55</td>
+        </tr>
+        <tr class="dep">
+            <td class="seq-col">19</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">TGW123</td>
+            <td>A321</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:33:35</td>
+            
+                <td>3</td>
+                <td>08:17:40</td>
+                <td>08:33:05</td>
+                <td>AC1C</td>
+            
+            <td class="highlight">08:38:25</td>
+            <td class="">4p50s</td>
+            <td>2p15s</td>
+            <td>08:39:10</td>
+        </tr>
+        <tr class="arr">
+            <td class="seq-col">20</td>
+            <td><span class="badge arr">ARR</span></td>
+            <td class="acid-col">BAV1158</td>
+            <td>A320</td>
+            <td><span class="wake-badge wake-m">MEDIUM</span></td>
+            <td class="rwy-col">25R</td>
+            <td>08:34:00</td>
+            <td colspan="4" class="na-cell">— hạ cánh —</td>
+            <td class="highlight">08:34:00</td>
+            <td class="">0s</td>
+            <td>5p00s</td>
+            <td>08:34:55</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  Kịch bản 1 – FCFS &nbsp;|&nbsp; Phân cách theo tiêu chuẩn Wake Turbulence Việt Nam &nbsp;|&nbsp;
+  Thời gian tính từ mốc 08:00:00 UTC+7
+</footer>
+
+</body>
+</html>
