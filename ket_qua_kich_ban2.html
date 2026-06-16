@@ -44,6 +44,14 @@
 
   main { padding: 28px 40px; }
 
+  /* Toggle button */
+  .btn-toggle {
+    margin-left: 14px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
+    background: linear-gradient(180deg,#143644,#0f2b3a); color: #ffc107; font-weight: 700; cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .btn-toggle[aria-pressed="true"] { box-shadow: 0 0 8px rgba(255,193,7,0.16) inset; }
+
   .section-title {
     font-size: 1rem; font-weight: 700; text-transform: uppercase;
     letter-spacing: .08em; color: #8ab4d8;
@@ -111,17 +119,44 @@
     padding: 11px 10px; text-align: center;
     border-bottom: 2px solid #28a745; white-space: nowrap;
   }
+  thead th.dman-col { color: #ffc107; font-weight: 700; }
   tbody tr { border-bottom: 1px solid #1a3251; }
+  @keyframes strobe-vip {
+    0%   { color: #ffc107; }
+    10%  { color: #ffffff; }
+    20%  { color: #ffc107; }
+    30%  { color: #ffffff; }
+    40%  { color: #ffc107; }
+    50%  { color: #ffffff; }
+    60%  { color: #ffc107; }
+    70%  { color: #ffffff; }
+    80%  { color: #ffc107; }
+    90%  { color: #ffffff; }
+    100% { color: #ffc107; }
+  }
+  @keyframes strobe-medical {
+    0%   { color: #ff8899; }
+    10%  { color: #ffffff; }
+    20%  { color: #ff8899; }
+    30%  { color: #ffffff; }
+    40%  { color: #ff8899; }
+    50%  { color: #ffffff; }
+    60%  { color: #ff8899; }
+    70%  { color: #ffffff; }
+    80%  { color: #ff8899; }
+    90%  { color: #ffffff; }
+    100% { color: #ff8899; }
+  }
   tbody tr:hover { filter: brightness(1.18); }
 
   tbody tr.dep     { background: #0e2236; }
   tbody tr.arr     { background: #0b1f16; }
   tbody tr.row-medical { background: #7f1014 !important; color: #fff9f9; border-left: 4px solid #ff717d; }
   tbody tr.row-medical td { color: #fff9f9; }
-  tbody tr.row-medical td.dman-col { background: rgba(255, 255, 255, 0.14); color: #fff9f9; font-weight: 700; border-radius: 4px; }
+  tbody tr.row-medical td.dman-col { background: rgba(255, 113, 125, 0.35); color: #ff8899; font-weight: 700; border-radius: 4px; animation: strobe-medical 0.5s steps(10, end) infinite; animation-timing-function: steps(10, end); transition: none; will-change: color; }
   tbody tr.row-vip     { background: #b57f00 !important; color: #2b1700; border-left: 4px solid #ffe066; }
   tbody tr.row-vip td { color: #2b1700; }
-  tbody tr.row-vip td.dman-col { background: rgba(255, 255, 0, 0.18); color: #2b1700; font-weight: 700; border-radius: 4px; }
+  tbody tr.row-vip td.dman-col { background: rgba(255, 193, 7, 0.35); color: #ffc107; font-weight: 700; border-radius: 4px; animation: strobe-vip 0.5s steps(10, end) infinite; animation-timing-function: steps(10, end); transition: none; will-change: color; }
 
   td { padding: 8px 10px; text-align: center; vertical-align: middle; }
   .seq-col  { color: #555e70; font-size: 0.76rem; width: 32px; }
@@ -159,6 +194,12 @@
     background: #1a2a4a; color: #88ccff; border: 1px solid #3a7abf;
   }
 
+  /* When strobe disabled, force DMAN cells to static color and disable animation */
+  .strobe-disabled tbody tr.row-vip td.dman-col,
+  .strobe-disabled tbody tr.row-medical td.dman-col {
+    animation: none !important; color: inherit !important;
+  }
+
   footer {
     text-align: center; font-size: 0.75rem; color: #3a5570;
     padding: 20px 40px 28px;
@@ -175,6 +216,7 @@
     <p>Sân bay Quốc tế Tân Sơn Nhất (VVTS) &nbsp;|&nbsp; Đường băng 25R / 25L &nbsp;|&nbsp;
        Datalink clearance · Ưu tiên VIP/Medical · Tối ưu hoá thứ tự bằng DMAN</p>
   </div>
+  <button id="strobe-toggle" class="btn-toggle" aria-pressed="false">Strobe: Bật</button>
 </header>
 
 <main>
@@ -202,7 +244,7 @@
           <th>Gate</th>
           <th>T_req</th>
           <th>T_HP (DEP)</th>
-          <th>DMAN Index</th>
+          <th class="dman-col">DMAN Index</th>
           <th>SID</th>
           <th>Gợi ý ATC</th>
           <th>T_actual ✈</th>
@@ -443,8 +485,30 @@
             <td>08:22:00</td>
             <td><span class="delta-same">–</span></td>
         </tr>
-        <tr class="dep ">
+        <tr class="dep row-medical">
             <td class="seq-col">13</td>
+            <td><span class="badge dep">DEP</span></td>
+            <td class="acid-col">HVN3356 <span class="pri-badge pri-medical">🏥 Khẩn cấp</span> </td>
+            <td>B744</td>
+            <td><span class="wake-badge wake-h">HEAVY</span></td>
+            <td class="rwy-col">25L</td>
+            <td>08:25:09</td>
+            
+                <td>10</td>
+                <td>08:12:35</td>
+                <td>08:24:39</td>
+                <td class="dman-col">08:21:39</td>
+                <td>AC1C</td>
+                <td class="hint-cell">Khẩn cấp – ưu tiên cất trước</td>
+            
+            <td class="highlight">08:29:19</td>
+            <td class="">4p10s</td>
+            <td>2p05s</td>
+            <td>08:30:09</td>
+            <td><span class="delta-better">▼ 1p41s</span></td>
+        </tr>
+        <tr class="dep ">
+            <td class="seq-col">14</td>
             <td><span class="badge dep">DEP</span></td>
             <td class="acid-col">HVN1356  </td>
             <td>A321</td>
@@ -466,7 +530,7 @@
             <td><span class="delta-better">▼ 1p21s</span></td>
         </tr>
         <tr class="dep ">
-            <td class="seq-col">14</td>
+            <td class="seq-col">15</td>
             <td><span class="badge dep">DEP</span></td>
             <td class="acid-col">VJC123  </td>
             <td>A320</td>
@@ -486,28 +550,6 @@
             <td>2p05s</td>
             <td>08:27:59</td>
             <td><span class="delta-better">▼ 1p31s</span></td>
-        </tr>
-        <tr class="dep row-medical">
-            <td class="seq-col">15</td>
-            <td><span class="badge dep">DEP</span></td>
-            <td class="acid-col">HVN3356 <span class="pri-badge pri-medical">🏥 Khẩn cấp</span> </td>
-            <td>B744</td>
-            <td><span class="wake-badge wake-h">HEAVY</span></td>
-            <td class="rwy-col">25L</td>
-            <td>08:25:09</td>
-            
-                <td>10</td>
-                <td>08:12:35</td>
-                <td>08:24:39</td>
-                <td class="dman-col">08:21:39</td>
-                <td>AC1C</td>
-                <td class="hint-cell">Khẩn cấp – ưu tiên cất trước</td>
-            
-            <td class="highlight">08:29:19</td>
-            <td class="">4p10s</td>
-            <td>2p05s</td>
-            <td>08:30:09</td>
-            <td><span class="delta-better">▼ 1p41s</span></td>
         </tr>
         <tr class="dep ">
             <td class="seq-col">16</td>
@@ -615,5 +657,27 @@
   Kịch bản 2 – ACDM + DCL/PDC + DMAN &nbsp;|&nbsp; Phân cách giảm nhẹ theo tiêu chuẩn tối ưu hoá &nbsp;|&nbsp;
   Thời gian tính từ mốc 08:00:00 UTC+7 &nbsp;|&nbsp; Quyết định cuối thuộc về kiểm soát viên không lưu
 </footer>
+
+<script>
+  (function(){
+    const STORAGE_KEY = 'kkb2_strobe_disabled';
+    const btn = document.getElementById('strobe-toggle');
+    function setState(disabled){
+      if(disabled) document.body.classList.add('strobe-disabled'); else document.body.classList.remove('strobe-disabled');
+      btn.setAttribute('aria-pressed', String(disabled));
+      btn.textContent = disabled ? 'Strobe: Tắt' : 'Strobe: Bật';
+      try{ localStorage.setItem(STORAGE_KEY, disabled ? '1' : '0'); }catch(e){}
+    }
+    // initialize
+    try{
+      const v = localStorage.getItem(STORAGE_KEY);
+      setState(v === '1');
+    }catch(e){ setState(false); }
+    btn.addEventListener('click', function(){
+      const disabled = document.body.classList.contains('strobe-disabled');
+      setState(!disabled);
+    });
+  })();
+</script>
 </body>
 </html>
