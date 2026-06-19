@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ thống Điều phối Động DMAN - VVTS</title>
+    <title>Mô phỏng DMAN - VVTS</title>
     <style>
         :root {
             --bg: #090d16; --panel-bg: #111827;
@@ -36,7 +36,7 @@
         .queue-viewport { position: relative; flex: 1; overflow-y: auto; overflow-x: hidden; border: 2px dashed #1f2937; border-radius: 8px; padding: 15px; background: #070a12; scroll-behavior: smooth; }
         
         .flight-card {
-            position: absolute; left: 15px; right: 15px; height: 75px;
+            position: absolute; left: 15px; right: 15px; height: 85px;
             border-radius: 8px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
             opacity: 0; transform: translateY(150px);
@@ -59,6 +59,10 @@
         }
 
         .card-left { display: flex; align-items: center; gap: 20px; }
+        .card-right { display: flex; align-items: center; gap: 30px; font-family: monospace; }
+        .time-column { display: flex; flex-direction: column; align-items: flex-end; }
+        .time-column + .time-column { border-left: 2px solid #334155; padding-left: 20px; }
+
         .acid-block { font-family: monospace; }
         .acid-text { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
         .meta-text { font-size: 12px; color: #94a3b8; margin-top: 2px; }
@@ -66,12 +70,14 @@
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; min-width: 55px; }
         .badge.arr-tag { background: #10b981; color: #042f1a; }
         .badge.dep-tag { background: #3b82f6; color: #1e3a8a; }
+        .badge.vip-tag { background: #f59e0b; color: #78350f; }
+        .badge.medical-tag { background: #ef4444; color: white; }
         .badge.pri-tag { background: #ef4444; color: white; }
 
         .gate-block { background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); font-size: 12px; font-weight: 600; color: #cbd5e1; }
-        .card-right { text-align: right; font-family: monospace; }
-        .time-label { font-size: 11px; color: #94a3b8; margin-bottom: 2px; }
-        .time-value { font-size: 16px; font-weight: bold; color: #60a5fa; }
+        .time-label { font-size: 10px; color: #94a3b8; margin-bottom: 1px; }
+        .time-value { font-size: 14px; font-weight: bold; color: #60a5fa; }
+        .dman-value { font-size: 14px; font-weight: bold; color: #fbbf24; }
     </style>
 </head>
 <body>
@@ -105,7 +111,7 @@
     </div>
 
     <script>
-        const rawData = [{"acid": "VJC370", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 240, "rwy": "25R", "rot": 55}, {"acid": "AAR731", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 450, "rwy": "25R", "rot": 60}, {"acid": "BAV1152", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "GATE 20", "ready_time": 529, "rwy": "25L", "rot": 50}, {"acid": "PIC442", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "VIP", "gate": "GATE 19", "ready_time": 719, "rwy": "25L", "rot": 45}, {"acid": "VJC390", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "GATE 22", "ready_time": 744, "rwy": "25L", "rot": 45}, {"acid": "CPA767", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "GATE 8", "ready_time": 809, "rwy": "25L", "rot": 45}, {"acid": "SIA178", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 840, "rwy": "25R", "rot": 60}, {"acid": "HVN1182", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": "GATE 11", "ready_time": 974, "rwy": "25L", "rot": 45}, {"acid": "CSN3069", "type": "ARR", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 990, "rwy": "25R", "rot": 55}, {"acid": "MAS768", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "GATE 16", "ready_time": 1164, "rwy": "25L", "rot": 50}, {"acid": "JAL750", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "GATE 13", "ready_time": 1179, "rwy": "25L", "rot": 50}, {"acid": "CAL5874", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 1260, "rwy": "25R", "rot": 60}, {"acid": "HVN1356", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": "GATE 1", "ready_time": 1484, "rwy": "25L", "rot": 45}, {"acid": "VJC123", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "GATE 5", "ready_time": 1494, "rwy": "25L", "rot": 45}, {"acid": "HVN3356", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Medical", "gate": "GATE 10", "ready_time": 1509, "rwy": "25L", "rot": 50}, {"acid": "KLM836", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "GATE 7", "ready_time": 1644, "rwy": "25L", "rot": 50}, {"acid": "QAN751", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "GATE 14", "ready_time": 1659, "rwy": "25L", "rot": 45}, {"acid": "CPA765", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 1740, "rwy": "25R", "rot": 55}, {"acid": "TGW123", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": "GATE 3", "ready_time": 1994, "rwy": "25L", "rot": 45}, {"acid": "BAV1158", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "RUNWAY 25R", "ready_time": 2040, "rwy": "25R", "rot": 55}];
+        const rawData = [{"acid": "VJC370", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "\u2013", "ready_time": 240, "rwy": "25R", "rot": 55, "dman_index": null}, {"acid": "AAR731", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "\u2013", "ready_time": 450, "rwy": "25R", "rot": 60, "dman_index": null}, {"acid": "BAV1152", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": 20, "ready_time": 529, "rwy": "25L", "rot": 50, "dman_index": 499}, {"acid": "PIC442", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "VIP", "gate": 19, "ready_time": 719, "rwy": "25L", "rot": 45, "dman_index": 569}, {"acid": "VJC390", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": 22, "ready_time": 744, "rwy": "25L", "rot": 45, "dman_index": 714}, {"acid": "CPA767", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": 8, "ready_time": 809, "rwy": "25L", "rot": 45, "dman_index": 779}, {"acid": "SIA178", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "\u2013", "ready_time": 840, "rwy": "25R", "rot": 60, "dman_index": null}, {"acid": "HVN1182", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": 11, "ready_time": 974, "rwy": "25L", "rot": 45, "dman_index": 944}, {"acid": "CSN3069", "type": "ARR", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": "\u2013", "ready_time": 990, "rwy": "25R", "rot": 55, "dman_index": null}, {"acid": "MAS768", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": 16, "ready_time": 1164, "rwy": "25L", "rot": 50, "dman_index": 1134}, {"acid": "JAL750", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": 13, "ready_time": 1179, "rwy": "25L", "rot": 50, "dman_index": 1149}, {"acid": "CAL5874", "type": "ARR", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": "\u2013", "ready_time": 1260, "rwy": "25R", "rot": 60, "dman_index": null}, {"acid": "HVN3356", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Medical", "gate": 10, "ready_time": 1509, "rwy": "25L", "rot": 50, "dman_index": 1299}, {"acid": "HVN1356", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": 1, "ready_time": 1484, "rwy": "25L", "rot": 45, "dman_index": 1454}, {"acid": "VJC123", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": 5, "ready_time": 1494, "rwy": "25L", "rot": 45, "dman_index": 1464}, {"acid": "KLM836", "type": "DEP", "ac_type": "B744", "wake": "H", "priority": "Normal", "gate": 7, "ready_time": 1644, "rwy": "25L", "rot": 50, "dman_index": 1614}, {"acid": "QAN751", "type": "DEP", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": 14, "ready_time": 1659, "rwy": "25L", "rot": 45, "dman_index": 1629}, {"acid": "CPA765", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "\u2013", "ready_time": 1740, "rwy": "25R", "rot": 55, "dman_index": null}, {"acid": "TGW123", "type": "DEP", "ac_type": "A321", "wake": "M", "priority": "Normal", "gate": 3, "ready_time": 1994, "rwy": "25L", "rot": 45, "dman_index": 1964}, {"acid": "BAV1158", "type": "ARR", "ac_type": "A320", "wake": "M", "priority": "Normal", "gate": "\u2013", "ready_time": 2040, "rwy": "25R", "rot": 55, "dman_index": null}];
         let simTime = 180;
         const endTime = 2640;
         let isRunning = false;
@@ -145,15 +151,11 @@
             }
         }
 
-        // ─── AUTO-SCROLL ──────────────────────────────────────
         function scrollToBottom() {
             const container = document.getElementById('main-queue-container');
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
+            if (container) container.scrollTop = container.scrollHeight;
         }
 
-        // ─── KIỂM TRA VÀ CHÈN THẺ MỚI ──────────────────────
         function checkNewFlights() {
             rawData.forEach(f => { if (f.ready_time === simTime) { insertFlightToQueue(f); } });
         }
@@ -164,9 +166,31 @@
             card.id = `card-${flight.acid}`;
             card.className = `flight-card ${flight.type.toLowerCase()} ${flight.priority.toLowerCase() !== 'normal' ? flight.priority.toLowerCase() : ''}`;
             
-            let typeTag = flight.type === 'ARR' ? '<span class="badge arr-tag">🛬 ARR</span>' : '<span class="badge dep-tag">🛫 DEP</span>';
+            let typeTag = '';
+            if (flight.type === 'ARR') {
+                typeTag = '<span class="badge arr-tag">🛬 ARR</span>';
+            } else {
+                if (flight.priority === 'VIP') {
+                    typeTag = '<span class="badge vip-tag">⭐ VIP</span>';
+                } else if (flight.priority === 'Medical') {
+                    typeTag = '<span class="badge medical-tag">🏥 Medical</span>';
+                } else {
+                    typeTag = '<span class="badge dep-tag">🛫 DEP</span>';
+                }
+            }
+            
             let priTag = flight.priority !== 'Normal' ? `<span class="badge pri-tag">⚠️ ${flight.priority}</span>` : '';
             
+            let dmanDisplay = '';
+            if (flight.dman_index !== undefined && flight.dman_index !== null) {
+                dmanDisplay = `
+                    <div class="time-label">DMAN Index</div>
+                    <div class="dman-value">${fmtSec(flight.dman_index)}</div>
+                `;
+            } else {
+                dmanDisplay = `<div class="time-label" style="color:#64748b;">—</div>`;
+            }
+
             card.innerHTML = `
                 <div class="card-left">
                     ${typeTag}
@@ -178,15 +202,20 @@
                     ${priTag}
                 </div>
                 <div class="card-right">
-                    <div class="time-label">Thời điểm dự kiến (FCFS)</div>
-                    <div class="time-value">${fmtSec(flight.ready_time)}</div>
+                    <div class="time-column">
+                        <div class="time-label">FCFS</div>
+                        <div class="time-value">${fmtSec(flight.ready_time)}</div>
+                    </div>
+                    <div class="time-column">
+                        ${dmanDisplay}
+                    </div>
                 </div>
             `;
             
             container.appendChild(card);
             setTimeout(() => {
                 card.classList.add('active');
-                scrollToBottom(); // Tự cuộn xuống sau khi thêm thẻ
+                scrollToBottom();
             }, 30);
 
             activeFlights.push(flight);
@@ -195,18 +224,25 @@
             if (flight.priority !== 'Normal') { executeDMANLogic(flight); }
         }
 
+        // ─── DMAN: HOÁN ĐỔI (CHỈ VỚI DEP) ────────────────────
         function executeDMANLogic(targetFlight) {
             let idx = activeFlights.findIndex(f => f.acid === targetFlight.acid);
             if (idx <= 0) return;
 
             let swapTargetIdx = -1;
             for (let i = idx - 1; i >= 0; i--) {
+                if (activeFlights[i].type !== 'DEP') continue;
                 let diff = targetFlight.ready_time - activeFlights[i].ready_time;
-                if (diff > 0 && diff <= 300) { swapTargetIdx = i; } else { break; }
+                if (diff > 0 && diff <= 300) {
+                    swapTargetIdx = i;
+                    break;
+                } else {
+                    break;
+                }
             }
 
             if (swapTargetIdx !== -1) {
-                document.getElementById('dman-status').innerText = `⚡ TÀU ƯU TIÊN: ${targetFlight.acid} THỎA MÃN ĐIỀU KIỆN (< 5p) -> THỰC THI RÚT THẺ...`;
+                document.getElementById('dman-status').innerText = `⚡ TÀU ƯU TIÊN: ${targetFlight.acid} THỎA MÃN ĐIỀU KIỆN (< 5p) -> THỰC THI HOÁN ĐỔI...`;
                 document.getElementById('dman-status').style.color = "#ef4444";
 
                 const targetCard = document.getElementById(`card-${targetFlight.acid}`);
@@ -216,7 +252,7 @@
                     activeFlights.splice(idx, 1);
                     activeFlights.splice(swapTargetIdx, 0, targetFlight);
                     recalculateAndRenderPositions(true);
-                    scrollToBottom(); // cuộn xuống sau khi sắp xếp lại
+                    scrollToBottom();
                 }, 1800);
 
                 setTimeout(() => {
@@ -227,60 +263,16 @@
                     }
                 }, 2800);
             } else {
-                document.getElementById('dman-status').innerText = `❌ TỪ CHỐI HOÁN ĐỔI: Chuyến bay ${targetFlight.acid} lệch quá 5 phút so với luồng trước!`;
+                document.getElementById('dman-status').innerText = `❌ TỪ CHỐI HOÁN ĐỔI: Không có DEP phù hợp phía trước hoặc chênh lệch quá 5 phút!`;
                 document.getElementById('dman-status').style.color = "#64748b";
             }
         }
 
         function recalculateAndRenderPositions(isSwapTriggered) {
-            let rwyFreeTimes = { '25R': 0, '25L': 0 };
-            let rwyLastType = { '25R': null, '25L': null };
-            let rwyLastWake = { '25R': null, '25L': null };
-
             activeFlights.forEach((flight, index) => {
-                let rwy = flight.rwy;
-                let ready = flight.ready_time;
-                let t_actual = ready;
-
-                if (rwyLastType[rwy] !== null) {
-                    let prevT = rwyLastType[rwy];
-                    let prevW = rwyLastWake[rwy];
-                    let sep = 80;
-
-                    if (prevT === 'DEP' && flight.type === 'DEP') {
-                        if (prevW === 'S' && flight.wake === 'H') sep = 110;
-                        else if (prevW === 'S' && flight.wake === 'M') sep = 165;
-                        else if (prevW === 'S' && flight.wake === 'L') sep = 220;
-                        else if (prevW === 'H' && flight.wake === 'M') sep = 110;
-                        else if (prevW === 'H' && flight.wake === 'L') sep = 165;
-                    } else if (prevT === 'ARR' && flight.type === 'ARR') {
-                        if (prevW === 'S' && flight.wake === 'H') sep = 165;
-                        else if (prevW === 'S' && flight.wake === 'M') sep = 220;
-                    } else if (prevT === 'ARR' && flight.type === 'DEP') { sep = 30; } 
-                      else if (prevT === 'DEP' && flight.type === 'ARR') { sep = 60; }
-                    
-                    t_actual = Math.max(ready, rwyFreeTimes[rwy] + sep);
-                }
-
-                rwyFreeTimes[rwy] = t_actual + flight.rot;
-                rwyLastType[rwy] = flight.type;
-                rwyLastWake[rwy] = flight.wake;
-
                 const card = document.getElementById(`card-${flight.acid}`);
                 if (card) {
-                    card.style.transform = `translateY(${index * 88}px)`;
-                    const rightZone = card.querySelector('.card-right');
-                    if (isSwapTriggered) {
-                        rightZone.innerHTML = `
-                            <div class="time-label" style="color:#10b981; font-weight:bold;">⏱️ Giờ Điều Phối Thực Tế</div>
-                            <div class="time-value" style="color:#10b981; font-size:18px;">${fmtSec(t_actual)}</div>
-                        `;
-                    } else {
-                        rightZone.innerHTML = `
-                            <div class="time-label">Thời điểm dự kiến (FCFS)</div>
-                            <div class="time-value">${fmtSec(flight.ready_time)}</div>
-                        `;
-                    }
+                    card.style.transform = `translateY(${index * 98}px)`;
                 }
             });
         }
